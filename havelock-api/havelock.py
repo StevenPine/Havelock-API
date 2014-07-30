@@ -24,14 +24,12 @@ BASE_URL='https://www.havelockinvestments.com/r/'
 logging.info('Running sample Havelock logging and API')
 logging.info('DEBUG %s', DEBUG)
 
-#live key below for ticker
-
+#place api key below
 key = {'key':'place api key here'}
 
 
 #symbol abbreviations
 #some symbols like '7C' changed because of python quirks
-
 SevenC={'symbol':'7C'}
 ALC={'symbol':'ALC'}
 AM1={'symbol':'AM1'}
@@ -63,9 +61,6 @@ class Havelock:
       self.keyname = keyname
       self.key = key
       self.tickers = []
-
-   def add_ticker(self, ticker):
-      self.tickers.append(ticker)
 
    def ticker(self,symbol):
       try:
@@ -163,7 +158,7 @@ class Havelock:
       except ValueError:
          logging.error('Havelock down?')
 
-#Below commands require a API key
+#Below commands require an API key
 
    def portfolio(self,key):
 
@@ -297,6 +292,7 @@ class Havelock:
    def ordercancel(self, payload):
    #takes key and id
    
+      M
       try:
          ordercancel = BASE_URL+'ordercancel'
          sendordercancel = requests.post(ordercancel, payload)
@@ -351,7 +347,7 @@ class Havelock:
 """
 The MIT License (MIT)
 
-Copyright (c) <year> <copyright holders>
+Copyright (c) 2014 Steven Lee BilloPine
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
