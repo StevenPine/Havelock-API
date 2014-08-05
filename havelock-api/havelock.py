@@ -56,7 +56,7 @@ class Havelock:
       commands['orderbook']         = {'symbol':''}
       commands['orderbookfull']     = {'symbol':''}
       commands['dividends']         = {'symbol':''}
-      commands['trades']            = {'symbol':'','dtsart':'yyyy-mm-dd hh:mm:ss','dtsend':'yyyy-mm-dd hh:mm:ss'}
+      commands['trades']            = {'symbol':'','dtstart':'yyyy-mm-dd hh:mm:ss','dtend':'yyyy-mm-dd hh:mm:ss'}
       commands['portfolio']         = {'key':''}
       commands['balance']           = {'key':''}
       commands['orders']            = {'key':''}
