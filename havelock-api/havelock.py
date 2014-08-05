@@ -24,32 +24,6 @@ BASE_URL='https://www.havelockinvestments.com/r/'
 logging.info('Running sample Havelock logging and API')
 logging.info('DEBUG %s', DEBUG)
 
-#place api key below
-key = {'key':'place api key here'}
-
-
-#symbol abbreviations
-#some symbols like '7C' changed because of python quirks
-SevenC={'symbol':'7C'}
-ALC={'symbol':'ALC'}
-AM1={'symbol':'AM1'}
-AM100={'symbol':'AM100'}
-B_EXCH={'symbol':'B.EXCH'}
-B_MINE={'symbol':'B.MINE'}
-B_SELL={'symbol':'B.SELL'}
-CBTC={'symbol':'CBTC'}
-CFIG={'symbol':'CFIG'}
-DEALCO={'symbol':'DEALCO'}
-HASH={'symbol':'HASH'}
-HIF={'symbol':'HIF'}
-HMF={'symbol':'HMF'}
-MS={'symbol':'MS'}
-PETA={'symbol':'PETA'}
-RENT={'symbol':'RENT'}
-ROCK={'symbol':'ROCK'}
-SCRYPT={'symbol':'SCRYPT'}
-SF1={'symbol':'SF1'}
-SMG={'symbol':'SMG'}
 
 #API commands
 #using havelock api documentation.
@@ -60,288 +34,51 @@ class Havelock:
    def __init__(self, keyname, key):
       self.keyname = keyname
       self.key = key
-      self.tickers = []
-
-   def ticker(self,symbol):
-      try:
-         ticker = BASE_URL+'ticker'
-
-         p = requests.post(ticker, symbol)
-         data = p.json()
-         logging.info(data)
-         
-         return data
-
-      except ValueError:
-         logging.error('Havelock down?')
-
-   def tickerfull(self,symbol):
-      try:
-         tickerfull = BASE_URL+'tickerfull'
-
-         p = requests.post(tickerfull, symbol)
-         data = p.json()
-         logging.info(data)
-         
-         return data
-
-      except ValueError:
-         logging.error('Havelock down?')
-
-   def orderbook(self,symbol):
-      try:
-         orderbook=BASE_URL+'orderbook'
-
-         getorderbook = requests.post(orderbook, symbol)
-         data = getorderbook.json()
-
-         return data
-
-      except ValueError:
-         logging.error('Havelock down?')
-
-   def orderbookfull(self,symbol):
-
-      try:
-         orderbookfull = BASE_URL+'orderbookfull'
-
-         getorderbookfull = requests.post(orderbookfull, symbol)
-         data = getorderbookfull.json()
-         logging.info(data)
-
-         return data
       
-      except ValueError:
-         logging.error('Havelock down?')
+      self.tickers = {}
 
-   def dividendhistory(self,symbol):
-      try:
-         dividends = BASE_URL+'dividends'
+      data = self.ApiCommand('ticker')
+      tickers = list(data)
+      tickers.sort()
+      i = 0
 
-         getdividends = requests.post(dividends, symbol)
-         data = getdividends.json()
-         logging.info(data)
-
-         return data
-
-      except ValueError:
-         logging.error('Havelock down?')
-
-   #Trade History
-   #comes with optional dtstart, dtend
-
-   def trade_history(self,symbol,dtstart,dtend):
-   #dtstart and end format is yyyy-mm-dd hh:mm:ss
-      try:
-         payload = {}
-
-         payload['symbol']    = symbol['symbol']
-         payload['dtstart']   = str(dtstart)
-         payload['dtend']     = str(dtend)
-
-         self.trades(payload)
+      while i < len(tickers):
+         self.tickers[str(tickers[i])]= {'symbol':str(tickers[i])}
+         i=i+1
       
-      except ValueError:
-         logging.error('Havelock down?')
+   def ApiCommand(self, command, **kwargs):
+      
 
-   def trades(self,payload):   
+      commands = {}
 
-      try:
-         trades = BASE_URL+'trades'
-
-         gettrades = requests.post(trades, payload)
-         data = gettrades.json()
-         logging.info(data)
-
-         return data
-
-      except ValueError:
-         logging.error('Havelock down?')
-
-#Below commands require an API key
-
-   def portfolio(self,key):
-
-      try:
-         portfolio = BASE_URL+'portfolio'
-         getportfolio = requests.post(portfolio, key)
-         data = getportfolio.json()
-         logging.info(data)
-
-         return data
-
-      except ValueError:
-         logging.error('Havelock down?')
-
-   def balance(self,key):
-
-      try:
-         balance = BASE_URL+'balance'
-         getbalance = requests.post(balance, key)
-         data = getbalance.json()
-         logging.info(data)
-
-         return data
-
-      except ValueError:
-         logging.error('Havelock down?')
-
-
-   def orders(self,key):
-   #list open orders
-
-      try:
-         orders = BASE_URL+'orders'
-         getorders = requests.post(orders, key)
-         data = getorders.json()
-         logging.info(data)
-
-         return data
-
-      except ValueError:
-         logging.error('Havelock down?')
-
-
-   def transactions_create(self, key, limit, sort, sinceid, sincets):
-   #limit: Maximum number of transactions to fetch (default: 50, maximum: 300)
-   #sort: Sort results ASC (Ascending) or DESC (Descending) (default: DESC)
-   #sinceid: Show transactions since (but not including) specific id (default: 0)
-   #sincets: Show transactions since (and including) specific ts (default: 0)
+      commands['ticker']            = {'symbol':''}
+      commands['tickerfull']        = {'symbol':''}
+      commands['orderbook']         = {'symbol':''}
+      commands['orderbookfull']     = {'symbol':''}
+      commands['dividends']         = {'symbol':''}
+      commands['trades']            = {'symbol':'','dtsart':'yyyy-mm-dd hh:mm:ss','dtsend':'yyyy-mm-dd hh:mm:ss'}
+      commands['portfolio']         = {'key':''}
+      commands['balance']           = {'key':''}
+      commands['orders']            = {'key':''}
+      commands['transactions']      = {'key':'','limit':'','sort':'','sinceid':'','sincets':''}
+      commands['withdraw']          = {'key':'','amount':'','address':''}
+      commands['deposit']           = {'key':''}
+      commands['ordercreate']       = {'key':'','symbol':'','action':'buy or sell','price':'','units':''}
+      commands['cancelorder']       = {'key':'','id':''}
       
       try:
-         payload = {}
 
-         payload['key']    = key['key']
-         payload['limit']  = int(limit)
-         payload['sort']   = str(sort)
-         payload['sinceid']= int(sinceid)
-         payload['sincets']= int(sincets)
+         if(command in commands):
+            commands[command] = kwargs
 
-         self.transactions(payload)
+            p = requests.post(BASE_URL+command, commands[command])
+            data = p.json()
+            logging.info(data)
 
+            return data
+            
       except ValueError:
          logging.error('Havelock down?')
-
-   def transactions(self,payload):
-   #transaction history
-
-      try:
-         transactions = BASE_URL+'transactions'
-         gettransactions = requests.post(transactions, key)
-         data = gettransactions.json()
-         logging.info(data)
-
-         return data
-
-      except ValueError:
-         logging.error('Havelock down?')
-   #
-   #Ensure API key is secure before allowing withdrawals!
-   #
-   def withdraw(self, payload):
-      
-      try:
-         withdraw = BASE_URL+'withdraw'
-         sendwithdraw = requests.post(withdraw, payload)
-         data = sendwithdraw.json()
-         logging.info(data)
-
-         return data
-      
-      except ValueError:
-         logging.error('Havelock down?')
-   
-   def withdraw_create(self, key, amount, address):
-      try:
-         payload = {}
-
-         payload['key']    = key['key']
-         payload['amount'] = Decimal(amount)
-         payload['address']= str(address)
-
-         self.withdraw(payload)
-      
-      except ValueError:
-         logging.error('Havelock down?')
-
-   def deposit(self, key):
-      try:
-         getdeposit = requests.post(deposit, key)
-         data = getdeposit.json()
-         logging.info(data)
-
-         return data
-
-      except ValueError:
-         logging.error('Havelock down?')
-
-   def ordercreate(self, payload):
-   #payload from build_order
-
-      try:
-         ordercreate = BASE_URL+'ordercreate'
-         sendordercreate = requests.post(ordercreate, payload)
-         data = sendordercreate.json()
-         logging.info(data)
-
-         return data
-
-      except ValueError:
-         logging.error('Havelock down?')
-
-   def ordercancel(self, payload):
-   #takes key and id
-   
-      M
-      try:
-         ordercancel = BASE_URL+'ordercancel'
-         sendordercancel = requests.post(ordercancel, payload)
-         data = sendordercancel.json()
-         logging.info(data)
-
-         return data
-
-      except ValueError:
-         logging.error('Havelock down?')
-
-   def ordercancel_create(self,key,id):
-      
-      try:
-         payload = {}
-
-         payload['key'] = key['key']
-         payload['id']  = int(id)
-
-         self.ordercancel(payload)
-      
-      except ValueError:
-         logging.error('Havelock down?')
-
-
-   def build_order(self, key, symbol, action, price, units):
-   #build the order then send it off to ordercreate
-   #eventually you want your bot to create and define the vars in payload for trading
-
-      try:
-         payload = {}
-         
-         payload['key']    = key['key']
-         payload['symbol'] = symbol['symbol']
-         payload['action'] = str(action)
-         payload['price']  = str(price)
-         payload['units']  = str(units)
-         
-         #send payload to ordercreate, this attempts to place an order
-         #the bot must process all order responses
-
-         self.ordercreate(payload)
-
-      except ValueError:
-         logging.error('Havelock down?')
-      except Exception as e:
-         logging.info(e)
-         logging.info(e.args)
-         
 
 
 """
