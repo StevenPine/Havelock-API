@@ -8,27 +8,28 @@ tickerbot = havelock.Havelock('ticker', 'ticker-key')
 
 def havelock(bot, trigger, **kwargs):
    
-   text  = trigger.group()
-
-   print 'text', text
-
-   my_list = re.split('\W+', str(text))
-   print 'my_list', my_list  
+   irc_input  = trigger.group()
 
 
-   command = my_list[2]
-   print 'length', len(my_list)
+   my_list = irc_input.split()
+   
+   
+   command = my_list[1]
 
+   c = len(my_list)-1
 
-   kwargs[my_list[3]] = my_list[4]
-
-   print 'command', command
-   print 'kwargs', kwargs
+   i = 2
+   j = 3
+   
+   while(i<c):
+      kwargs[my_list[i]] = my_list[j]
+      i = i+1
+      j = j+1
 
    data     = tickerbot.ApiCommand(command, **kwargs)
    data     = str(data)
    
-   bot.say(data)
+   bot.say(data,max_messages=5)
 
 
 
